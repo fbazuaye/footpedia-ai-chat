@@ -41,29 +41,34 @@ const Index = () => {
 
   const callFlowiseAPI = async (question: string) => {
     try {
-      console.log('Sending request to Flowise:', { question });
+      console.log('Sending request to Flowise RAG:', { question });
       
       const response = await fetch('/api/flowise', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ question }),
+        body: JSON.stringify({ 
+          question,
+          // Additional parameters for RAG optimization
+          temperature: 0.1,
+          topK: 3
+        }),
       });
 
-      console.log('Flowise response status:', response.status);
+      console.log('Flowise RAG response status:', response.status);
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Flowise API error response:', errorText);
+        console.error('Flowise RAG API error:', errorText);
         throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
       }
 
       const data = await response.json();
-      console.log('Flowise API response:', data);
+      console.log('Flowise RAG API response:', data);
       return data;
     } catch (error) {
-      console.error('Flowise API error:', error);
+      console.error('Flowise RAG API error:', error);
       throw error;
     }
   };
@@ -88,12 +93,14 @@ const Index = () => {
       const response = await callFlowiseAPI(query);
       console.log('Received response from Flowise:', response);
       
-      // Extract response content and sources
-      const aiContent = response.text || response.answer || "I couldn't find a relevant answer to your question.";
+      // Extract response content and sources from RAG endpoint
+      const aiContent = response.text || response.answer || response.result || "I couldn't find relevant information in the documents to answer your question.";
+      
+      // Handle different source document formats from Flowise RAG
       const sources = response.sourceDocuments?.map((doc: any, index: number) => ({
-        title: doc.metadata?.title || `Source ${index + 1}`,
-        url: doc.metadata?.url
-      })) || [];
+        title: doc.metadata?.source || doc.metadata?.title || doc.metadata?.filename || `Document ${index + 1}`,
+        url: doc.metadata?.url || doc.metadata?.source
+      })).filter(source => source.title && source.title !== `Document ${sources?.indexOf(source) + 1}`) || [];
 
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
