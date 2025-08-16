@@ -41,42 +41,66 @@ const Index = () => {
 
   const callFlowiseAPI = async (question: string) => {
     try {
-      console.log('Sending request to Flowise RAG:', { question });
+      console.log('🌐 Sending request to Flowise RAG API');
+      console.log('🌐 Question:', question);
+      console.log('🌐 Request URL: /api/flowise');
+      
+      const requestBody = { 
+        question,
+        temperature: 0.1,
+        topK: 3
+      };
+      console.log('🌐 Request body:', requestBody);
       
       const response = await fetch('/api/flowise', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          question,
-          // Additional parameters for RAG optimization
-          temperature: 0.1,
-          topK: 3
-        }),
+        body: JSON.stringify(requestBody),
       });
 
-      console.log('Flowise RAG response status:', response.status);
+      console.log('🌐 Flowise RAG response received');
+      console.log('🌐 Response status:', response.status);
+      console.log('🌐 Response ok:', response.ok);
+      console.log('🌐 Response headers:', Object.fromEntries(response.headers.entries()));
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Flowise RAG API error:', errorText);
-        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+        console.error('❌ Flowise RAG API error response:', errorText);
+        throw new Error(`Flowise API error: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
-      console.log('Flowise RAG API response:', data);
+      console.log('✅ Flowise RAG API response data:', data);
+      console.log('✅ Response data type:', typeof data);
+      console.log('✅ Response data keys:', Object.keys(data || {}));
       return data;
     } catch (error) {
-      console.error('Flowise RAG API error:', error);
+      console.error('❌ Flowise RAG API error:', error);
+      console.error('❌ Error occurred in callFlowiseAPI function');
       throw error;
     }
   };
 
   const handleSearch = async (query: string) => {
-    console.log('handleSearch called with query:', query);
+    console.log('🔍 handleSearch called with query:', query);
+    console.log('🔍 Query length:', query.length);
+    console.log('🔍 Query trimmed:', query.trim());
+    
+    if (!query.trim()) {
+      console.error('❌ Empty query provided');
+      toast({
+        title: "Search Error",
+        description: "Please enter a question to search.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     setHasSearched(true);
+    console.log('🔍 Loading state set to true');
 
     // Add user message immediately
     const userMessage: Message = {
@@ -86,12 +110,20 @@ const Index = () => {
       timestamp: new Date(),
     };
 
-    setCurrentMessages(prev => [...prev, userMessage]);
+    console.log('🔍 User message created:', userMessage);
+    setCurrentMessages(prev => {
+      console.log('🔍 Adding user message to current messages');
+      return [...prev, userMessage];
+    });
 
     try {
-      console.log('About to call Flowise API...');
+      console.log('🚀 About to call Flowise RAG API...');
+      console.log('🚀 API call starting with query:', query);
+      
       const response = await callFlowiseAPI(query);
-      console.log('Received response from Flowise:', response);
+      console.log('✅ Received response from Flowise RAG:', response);
+      console.log('✅ Response type:', typeof response);
+      console.log('✅ Response keys:', Object.keys(response || {}));
       
       // Extract response content and sources from RAG endpoint
       const aiContent = response.text || response.answer || response.result || "I couldn't find relevant information in the documents to answer your question.";
@@ -133,21 +165,29 @@ const Index = () => {
       }
 
     } catch (error) {
+      console.error('❌ Search error occurred:', error);
+      console.error('❌ Error type:', typeof error);
+      console.error('❌ Error message:', error instanceof Error ? error.message : 'Unknown error');
+      console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+      
+      const errorDescription = error instanceof Error ? error.message : "Failed to get response. Please try again.";
+      
       toast({
         title: "Search Error",
-        description: "Failed to get response. Please try again.",
+        description: errorDescription,
         variant: "destructive",
       });
 
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
-        content: "Sorry, I'm having trouble connecting right now. Please try your question again.",
+        content: `Sorry, I encountered an error: ${errorDescription}. Please try your question again.`,
         timestamp: new Date(),
       };
 
       setCurrentMessages(prev => [...prev, errorMessage]);
     } finally {
+      console.log('🔍 Setting loading to false');
       setIsLoading(false);
     }
   };
