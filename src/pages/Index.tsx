@@ -177,7 +177,7 @@ const Index = () => {
           <div className="flex-1 flex flex-col items-center justify-center px-6">
             <div className="text-center mb-12">
               <h1 className="text-6xl font-bold mb-4 text-foreground">
-                Foot<span className="text-primary">Pedia</span>
+                Football<span className="text-primary">Pedia</span>
               </h1>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
                 Your AI-powered football knowledge companion. Ask anything about players, teams, matches, statistics, and football history.
@@ -210,7 +210,7 @@ const Index = () => {
           <div className="flex-1 flex flex-col">
             <div className="border-b border-border bg-card/50 p-4">
               <h2 className="text-lg font-semibold text-foreground">
-                Foot<span className="text-primary">Pedia</span>
+                Football<span className="text-primary">Pedia</span>
               </h2>
             </div>
 
