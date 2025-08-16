@@ -23,13 +23,13 @@ export function SearchInput({ onSearch, isLoading, placeholder = "Ask anything a
   return (
     <form onSubmit={handleSubmit} className="flex items-center w-full max-w-2xl mx-auto">
       <div className="relative flex-1">
-        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+        <Search className="absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
         <Input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={placeholder}
-          className="pl-12 pr-4 py-6 text-lg rounded-full border-2 border-border hover:border-primary/20 focus:border-primary transition-colors shadow-sm"
+          className="pl-10 md:pl-12 pr-4 py-4 md:py-6 text-base md:text-lg rounded-full border-2 border-border hover:border-primary/20 focus:border-primary transition-colors shadow-sm"
           style={{ boxShadow: "var(--search-shadow)" }}
           disabled={isLoading}
           autoFocus
@@ -39,12 +39,12 @@ export function SearchInput({ onSearch, isLoading, placeholder = "Ask anything a
         <Button
           type="submit"
           disabled={!query.trim() || isLoading}
-          className="ml-3 px-6 py-6 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground"
+          className="ml-2 md:ml-3 px-4 md:px-6 py-4 md:py-6 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground"
         >
           {isLoading ? (
-            <Loader2 className="h-5 w-5 animate-spin" />
+            <Loader2 className="h-4 w-4 md:h-5 md:w-5 animate-spin" />
           ) : (
-            <Search className="h-5 w-5" />
+            <Search className="h-4 w-4 md:h-5 md:w-5" />
           )}
         </Button>
       )}

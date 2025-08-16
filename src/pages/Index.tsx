@@ -5,6 +5,7 @@ import { ConversationPanel } from "@/components/ConversationPanel";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Message {
   id: string;
@@ -30,6 +31,7 @@ const Index = () => {
   const [hasSearched, setHasSearched] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -224,21 +226,21 @@ const Index = () => {
       <div className="flex-1 flex flex-col">
         {showHomepage ? (
           // Homepage View
-          <div className="flex-1 flex flex-col items-center justify-center px-6">
-            <div className="text-center mb-12">
-              <h1 className="text-6xl font-bold mb-4 text-foreground">
+          <div className="flex-1 flex flex-col items-center justify-center px-4 md:px-6">
+            <div className="text-center mb-8 md:mb-12">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-foreground">
                 Football<span className="text-primary">Pedia</span>
               </h1>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed px-4">
                 Your AI-powered football knowledge companion. Ask anything about players, teams, matches, statistics, and football history.
               </p>
             </div>
 
-            <div className="w-full max-w-2xl">
+            <div className="w-full max-w-2xl px-4">
               <SearchInput onSearch={handleSearch} isLoading={isLoading} />
             </div>
 
-            <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <div className="mt-6 md:mt-8 flex flex-wrap justify-center gap-2 md:gap-3 px-4">
               {[
                 "Who won the 2022 World Cup?",
                 "Tell me about Lionel Messi's career",
@@ -248,7 +250,7 @@ const Index = () => {
                 <button
                   key={suggestion}
                   onClick={() => handleSearch(suggestion)}
-                  className="px-4 py-2 text-sm bg-accent hover:bg-accent/80 text-accent-foreground rounded-full transition-colors border border-border"
+                  className="px-3 md:px-4 py-2 text-xs md:text-sm bg-accent hover:bg-accent/80 text-accent-foreground rounded-full transition-colors border border-border"
                 >
                   {suggestion}
                 </button>
@@ -258,13 +260,13 @@ const Index = () => {
         ) : (
           // Chat View
           <div className="flex-1 flex flex-col">
-            <div className="border-b border-border bg-card/50 p-4">
+            <div className="border-b border-border bg-card/50 p-4 pl-16 md:pl-4">
               <h2 className="text-lg font-semibold text-foreground">
                 Football<span className="text-primary">Pedia</span>
               </h2>
             </div>
 
-            <ScrollArea className="flex-1 p-6">
+            <ScrollArea className="flex-1 p-4 md:p-6">
               <div className="max-w-4xl mx-auto">
                 {currentMessages.map((message) => (
                   <MessageBubble key={message.id} message={message} />
@@ -280,7 +282,7 @@ const Index = () => {
                   onSearch={handleSearch} 
                   isLoading={isLoading} 
                   placeholder="Ask a follow-up question..."
-                  showButton={false}
+                  showButton={!isMobile}
                 />
               </div>
             </div>
@@ -288,8 +290,12 @@ const Index = () => {
         )}
 
         {/* Footer */}
-        <footer className="border-t border-border bg-card/30 p-4 text-center text-sm text-muted-foreground">
-          Designed By Frank Bazuaye • Powered By LiveGig Ltd.
+        <footer className="border-t border-border bg-card/30 p-4 text-center text-xs md:text-sm text-muted-foreground">
+          <div className="flex flex-col md:flex-row md:justify-center md:space-x-2">
+            <span>Designed By Frank Bazuaye</span>
+            <span className="hidden md:inline">•</span>
+            <span>Powered By LiveGig Ltd.</span>
+          </div>
         </footer>
       </div>
     </div>
