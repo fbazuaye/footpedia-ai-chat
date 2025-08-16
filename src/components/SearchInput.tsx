@@ -1,0 +1,53 @@
+import { useState } from "react";
+import { Search, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+
+interface SearchInputProps {
+  onSearch: (query: string) => void;
+  isLoading: boolean;
+  placeholder?: string;
+  showButton?: boolean;
+}
+
+export function SearchInput({ onSearch, isLoading, placeholder = "Ask anything about Football...", showButton = true }: SearchInputProps) {
+  const [query, setQuery] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (query.trim() && !isLoading) {
+      onSearch(query.trim());
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="flex items-center w-full max-w-2xl mx-auto">
+      <div className="relative flex-1">
+        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+        <Input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={placeholder}
+          className="pl-12 pr-4 py-6 text-lg rounded-full border-2 border-border hover:border-primary/20 focus:border-primary transition-colors shadow-sm"
+          style={{ boxShadow: "var(--search-shadow)" }}
+          disabled={isLoading}
+          autoFocus
+        />
+      </div>
+      {showButton && (
+        <Button
+          type="submit"
+          disabled={!query.trim() || isLoading}
+          className="ml-3 px-6 py-6 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground"
+        >
+          {isLoading ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : (
+            <Search className="h-5 w-5" />
+          )}
+        </Button>
+      )}
+    </form>
+  );
+}
