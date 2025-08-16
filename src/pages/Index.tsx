@@ -41,63 +41,37 @@ const Index = () => {
 
   const callFlowiseAPI = async (question: string) => {
     try {
-      console.log('🌐 Sending request directly to Flowise RAG API');
+      console.log('🌐 Calling Flowise via Supabase Edge Function');
       console.log('🌐 Question:', question);
       
-      const requestBody = { 
-        question,
-        temperature: 0.1,
-        topK: 3
-      };
+      const requestBody = { question };
       console.log('🌐 Request body:', requestBody);
       
-      // Call Flowise endpoint directly (bypassing proxy)
-      const response = await fetch('https://srv938896.hstgr.cloud/api/v1/prediction/d800a991-bf6d-4c73-aa66-b71413aff520', {
+      // Call via Supabase Edge Function to bypass CORS
+      const response = await fetch('https://ehfhstaqadbfrhfuxius.supabase.co/functions/v1/flowise-chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVoZmhzdGFxYWRiZnJoZnV4aXVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgwNzk2MTEsImV4cCI6MjA2MzY1NTYxMX0.XBQJyqNuJQrESovR0qqGwAD5u6N1QDJYvhX-qt4k3lo'}`,
         },
         body: JSON.stringify(requestBody),
       });
 
-      console.log('🌐 Flowise RAG response received');
+      console.log('🌐 Edge Function response received');
       console.log('🌐 Response status:', response.status);
       console.log('🌐 Response ok:', response.ok);
-      console.log('🌐 Response headers:', Object.fromEntries(response.headers.entries()));
 
       if (!response.ok) {
-        const contentType = response.headers.get('content-type');
-        console.error('❌ Response not ok. Content-Type:', contentType);
-        
-        let errorText = 'Unknown error';
-        if (contentType?.includes('text/html')) {
-          errorText = `Server returned HTML (likely 404). Check if endpoint URL is correct.`;
-          console.error('❌ Server returned HTML instead of JSON - endpoint may be incorrect');
-        } else {
-          errorText = await response.text();
-        }
-        
-        console.error('❌ Flowise RAG API error response:', errorText);
-        throw new Error(`Flowise API error: ${response.status} - ${errorText}`);
-      }
-
-      const contentType = response.headers.get('content-type');
-      if (!contentType?.includes('application/json')) {
-        console.error('❌ Response is not JSON. Content-Type:', contentType);
-        const responseText = await response.text();
-        console.error('❌ Response body:', responseText.substring(0, 200) + '...');
-        throw new Error('Server returned non-JSON response. Check endpoint configuration.');
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('❌ Edge Function error:', errorData);
+        throw new Error(`Edge Function error: ${response.status} - ${errorData.error || 'Unknown error'}`);
       }
 
       const data = await response.json();
-      console.log('✅ Flowise RAG API response data:', data);
-      console.log('✅ Response data type:', typeof data);
-      console.log('✅ Response data keys:', Object.keys(data || {}));
+      console.log('✅ Edge Function response data:', data);
       return data;
     } catch (error) {
-      console.error('❌ Flowise RAG API error:', error);
-      console.error('❌ Error occurred in callFlowiseAPI function');
+      console.error('❌ Edge Function call error:', error);
       throw error;
     }
   };
