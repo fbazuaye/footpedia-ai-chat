@@ -66,9 +66,27 @@ const Index = () => {
       console.log('🌐 Response headers:', Object.fromEntries(response.headers.entries()));
 
       if (!response.ok) {
-        const errorText = await response.text();
+        const contentType = response.headers.get('content-type');
+        console.error('❌ Response not ok. Content-Type:', contentType);
+        
+        let errorText = 'Unknown error';
+        if (contentType?.includes('text/html')) {
+          errorText = `Server returned HTML (likely 404). Check if endpoint URL is correct.`;
+          console.error('❌ Server returned HTML instead of JSON - endpoint may be incorrect');
+        } else {
+          errorText = await response.text();
+        }
+        
         console.error('❌ Flowise RAG API error response:', errorText);
         throw new Error(`Flowise API error: ${response.status} - ${errorText}`);
+      }
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType?.includes('application/json')) {
+        console.error('❌ Response is not JSON. Content-Type:', contentType);
+        const responseText = await response.text();
+        console.error('❌ Response body:', responseText.substring(0, 200) + '...');
+        throw new Error('Server returned non-JSON response. Check endpoint configuration.');
       }
 
       const data = await response.json();
