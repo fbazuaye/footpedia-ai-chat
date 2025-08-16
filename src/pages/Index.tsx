@@ -41,6 +41,8 @@ const Index = () => {
 
   const callFlowiseAPI = async (question: string) => {
     try {
+      console.log('Sending request to Flowise:', { question });
+      
       const response = await fetch('https://srv938896.hstgr.cloud/api/v1/prediction/d800a991-bf6d-4c73-aa66-b71413aff520', {
         method: 'POST',
         headers: {
@@ -49,11 +51,16 @@ const Index = () => {
         body: JSON.stringify({ question }),
       });
 
+      console.log('Flowise response status:', response.status);
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        console.error('Flowise API error response:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
       }
 
       const data = await response.json();
+      console.log('Flowise API response:', data);
       return data;
     } catch (error) {
       console.error('Flowise API error:', error);
