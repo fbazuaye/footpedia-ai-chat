@@ -41,9 +41,8 @@ const Index = () => {
 
   const callFlowiseAPI = async (question: string) => {
     try {
-      console.log('🌐 Sending request to Flowise RAG API');
+      console.log('🌐 Sending request directly to Flowise RAG API');
       console.log('🌐 Question:', question);
-      console.log('🌐 Request URL: /api/flowise');
       
       const requestBody = { 
         question,
@@ -52,10 +51,12 @@ const Index = () => {
       };
       console.log('🌐 Request body:', requestBody);
       
-      const response = await fetch('/api/flowise', {
+      // Call Flowise endpoint directly (bypassing proxy)
+      const response = await fetch('https://srv938896.hstgr.cloud/api/v1/prediction/d800a991-bf6d-4c73-aa66-b71413aff520', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
         },
         body: JSON.stringify(requestBody),
       });
