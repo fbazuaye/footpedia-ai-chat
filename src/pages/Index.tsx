@@ -69,6 +69,7 @@ const Index = () => {
   };
 
   const handleSearch = async (query: string) => {
+    console.log('handleSearch called with query:', query);
     setIsLoading(true);
     setHasSearched(true);
 
@@ -83,7 +84,9 @@ const Index = () => {
     setCurrentMessages(prev => [...prev, userMessage]);
 
     try {
+      console.log('About to call Flowise API...');
       const response = await callFlowiseAPI(query);
+      console.log('Received response from Flowise:', response);
       
       // Extract response content and sources
       const aiContent = response.text || response.answer || "I couldn't find a relevant answer to your question.";
