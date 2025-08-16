@@ -43,7 +43,7 @@ const Index = () => {
     try {
       console.log('Sending request to Flowise:', { question });
       
-      const response = await fetch('https://srv938896.hstgr.cloud/api/v1/prediction/d800a991-bf6d-4c73-aa66-b71413aff520', {
+      const response = await fetch('/api/flowise', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
