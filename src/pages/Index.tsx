@@ -6,6 +6,7 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Message {
   id: string;
@@ -138,6 +139,19 @@ const Index = () => {
       };
 
       setCurrentMessages(prev => [...prev, aiMessage]);
+
+      // Save to public search history (no authentication required)
+      try {
+        await supabase
+          .from('public_search_history')
+          .insert({
+            query: query,
+            response: aiContent
+          });
+      } catch (historyError) {
+        console.error('Failed to save search history:', historyError);
+        // Don't show error to user as this is not critical functionality
+      }
 
       // Update or create conversation
       if (activeConversation) {

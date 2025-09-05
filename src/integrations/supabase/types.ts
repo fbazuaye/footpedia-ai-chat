@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      access_logs: {
+        Row: {
+          access_granted: boolean
+          access_reason: string | null
+          created_at: string
+          digital_id: string
+          id: string
+          location: string | null
+          reader_user_id: string | null
+        }
+        Insert: {
+          access_granted: boolean
+          access_reason?: string | null
+          created_at?: string
+          digital_id: string
+          id?: string
+          location?: string | null
+          reader_user_id?: string | null
+        }
+        Update: {
+          access_granted?: boolean
+          access_reason?: string | null
+          created_at?: string
+          digital_id?: string
+          id?: string
+          location?: string | null
+          reader_user_id?: string | null
+        }
+        Relationships: []
+      }
       app_data: {
         Row: {
           created_at: string
@@ -161,6 +191,27 @@ export type Database = {
         }
         Relationships: []
       }
+      public_search_history: {
+        Row: {
+          created_at: string
+          id: string
+          query: string
+          response: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          query: string
+          response?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          query?: string
+          response?: string | null
+        }
+        Relationships: []
+      }
       saved_verses: {
         Row: {
           explanation: string | null
@@ -248,6 +299,48 @@ export type Database = {
         }
         Relationships: []
       }
+      tappass_users: {
+        Row: {
+          access_level: Database["public"]["Enums"]["access_level"]
+          created_at: string
+          department: string | null
+          digital_id: string
+          full_name: string | null
+          id: string
+          is_active: boolean
+          phone: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_level?: Database["public"]["Enums"]["access_level"]
+          created_at?: string
+          department?: string | null
+          digital_id?: string
+          full_name?: string | null
+          id?: string
+          is_active?: boolean
+          phone?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_level?: Database["public"]["Enums"]["access_level"]
+          created_at?: string
+          department?: string | null
+          digital_id?: string
+          full_name?: string | null
+          id?: string
+          is_active?: boolean
+          phone?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_uploads: {
         Row: {
           created_at: string
@@ -316,10 +409,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_admin_user: {
+        Args: { _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      access_level: "full" | "restricted" | "visitor"
+      user_role: "admin" | "employee" | "student" | "guest"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -446,6 +543,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      access_level: ["full", "restricted", "visitor"],
+      user_role: ["admin", "employee", "student", "guest"],
+    },
   },
 } as const
